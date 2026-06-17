@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reja Solar System</title>
+
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    background:black;
+}
+
+canvas{
+    display:block;
+}
+
+#title{
+    position:absolute;
+    top:20px;
+    width:100%;
+    text-align:center;
+    color:white;
+    font-family:Arial;
+    letter-spacing:4px;
+    text-shadow:0 0 20px cyan;
+}
+</style>
+</head>
+<body>
+
+<div id="title">🪐  SOLAR SYSTEM🪐</div>
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+const centerX = canvas.width/2;
+const centerY = canvas.height/2;
+
+const stars = [];
+
+for(let i=0;i<500;i++){
+    stars.push({
+        x:Math.random()*canvas.width,
+        y:Math.random()*canvas.height,
+        r:Math.random()*2
+    });
+}
+
+const planets = [
+{r:60,size:4,color:"#aaa",speed:0.04,name:"Mercury"},
+{r:90,size:7,color:"#e6c27a",speed:0.03,name:"Venus"},
+{r:130,size:8,color:"#4ea5ff",speed:0.025,name:"Earth"},
+{r:170,size:6,color:"#ff5533",speed:0.02,name:"Mars"},
+{r:230,size:15,color:"#d9b38c",speed:0.015,name:"Jupiter"},
+{r:300,size:13,color:"#f2d7a1",speed:0.01,name:"Saturn"},
+{r:360,size:10,color:"#7fffd4",speed:0.007,name:"Uranus"},
+{r:420,size:10,color:"#4fa3ff",speed:0.005,name:"Neptune"}
+];
+
+let time = 0;
+
+function draw(){
+
+    ctx.fillStyle="black";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    // stars
+    ctx.fillStyle="white";
+    stars.forEach(s=>{
+        ctx.beginPath();
+        ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctx.fill();
+    });
+
+    // sun glow
+    let glow = ctx.createRadialGradient(
+        centerX,centerY,20,
+        centerX,centerY,120
+    );
+
+    glow.addColorStop(0,"yellow");
+    glow.addColorStop(1,"rgba(255,200,0,0)");
+
+    ctx.fillStyle=glow;
+    ctx.beginPath();
+    ctx.arc(centerX,centerY,120,0,Math.PI*2);
+    ctx.fill();
+
+    // sun
+    ctx.fillStyle="gold";
+    ctx.beginPath();
+    ctx.arc(centerX,centerY,30,0,Math.PI*2);
+    ctx.fill();
+
+    planets.forEach((p,index)=>{
+
+        ctx.strokeStyle="rgba(255,255,255,0.08)";
+        ctx.beginPath();
+        ctx.arc(centerX,centerY,p.r,0,Math.PI*2);
+        ctx.stroke();
+
+        let angle = time * p.speed;
+
+        let x = centerX + Math.cos(angle)*p.r;
+        let y = centerY + Math.sin(angle)*p.r;
+
+        ctx.fillStyle=p.color;
+        ctx.beginPath();
+        ctx.arc(x,y,p.size,0,Math.PI*2);
+        ctx.fill();
+
+        // Saturn ring
+        if(index===5){
+            ctx.strokeStyle="rgba(255,255,255,.7)";
+            ctx.beginPath();
+            ctx.ellipse(x,y,p.size+8,p.size+3,0,0,Math.PI*2);
+            ctx.stroke();
+        }
+
+        // Moon
+        if(index===2){
+            let moonX = x + Math.cos(time*0.15)*18;
+            let moonY = y + Math.sin(time*0.15)*18;
+
+            ctx.fillStyle="#ddd";
+            ctx.beginPath();
+            ctx.arc(moonX,moonY,2.5,0,Math.PI*2);
+            ctx.fill();
+        }
+    });
+
+    time++;
+    requestAnimationFrame(draw);
+}
+
+draw();
+
+window.addEventListener("resize",()=>{
+    canvas.width=innerWidth;
+    canvas.height=innerHeight;
+});
+</script>
+
+</body>
+</html>
